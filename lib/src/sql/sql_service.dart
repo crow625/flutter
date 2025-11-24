@@ -14,8 +14,8 @@ class SqlService implements AppService {
     db = await openDatabase(path);
   }
 
-  Future<void> createTable(String name) async {
-    // db.execute(sql)
+  Future<void> execute(String query) async {
+    await db.execute(query);
   }
 
   @override
