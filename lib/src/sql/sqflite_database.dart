@@ -1,0 +1,76 @@
+import 'package:flutter_app/src/generic/result.dart';
+import 'package:flutter_app/src/sql/sql_database.dart';
+import 'package:flutter_app/src/sql/sql_error.dart';
+import 'package:sqflite/sqflite.dart';
+
+const _notInitialized = SqlError("Database not initialized.");
+
+class SqfliteDatabase implements ISqlDatabase<Map<String, Object?>> {
+  final String path;
+  late final Database db;
+
+  bool _initialized = false;
+
+  SqfliteDatabase(this.path);
+
+  @override
+  Future<Result<void, SqlError>> dispose() async {
+    if (!_initialized) return const Result.error(_notInitialized);
+    try {
+      await db.close();
+      return const Result.success(null);
+    } catch (e) {
+      return Result.error(SqlError("Failed to close database: $e"));
+    }
+  }
+
+  @override
+  Future<Result<void, SqlError>> execute(String sql,
+      [List<Object?>? arguments]) async {
+    if (!_initialized) return const Result.error(_notInitialized);
+    try {
+      await db.execute(sql, arguments);
+      return const Result.success(null);
+    } catch (e) {
+      return Result.error(SqlError("Failed to execute: $e"));
+    }
+  }
+
+  @override
+  Future<Result<void, SqlError>> init() async {
+    if (_initialized) {
+      return const Result.error(SqlError("Database already initialized."));
+    }
+    try {
+      db = await openDatabase(path);
+      _initialized = true;
+      return const Result.success(null);
+    } catch (e) {
+      return Result.error(SqlError("Failed to initialize database: $e"));
+    }
+  }
+
+  @override
+  Future<Result<void, SqlError>> insert(
+      String tableName, Map<String, Object?> values) async {
+    if (!_initialized) return const Result.error(_notInitialized);
+    try {
+      await db.insert(tableName, values);
+      return const Result.success(null);
+    } catch (e) {
+      return Result.error(SqlError("Failed to insert: $e"));
+    }
+  }
+
+  @override
+  Future<Result<List<Map<String, Object?>>, SqlError>> query(
+      String tableName) async {
+    if (!_initialized) return const Result.error(_notInitialized);
+    try {
+      final values = await db.query(tableName);
+      return Result.success(values);
+    } catch (e) {
+      return Result.error(SqlError("Failed to query: $e"));
+    }
+  }
+}
