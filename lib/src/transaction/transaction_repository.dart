@@ -15,7 +15,7 @@ class TransactionRepository extends SqlService {
   Future<void> insertTransaction(TransactionModel t) async {
     await db.insert(
       tableName,
-      t.toMap(),
+      t.toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
@@ -24,25 +24,14 @@ class TransactionRepository extends SqlService {
   Future<List<TransactionModel>> getTransactions() async {
     final List<Map<String, Object?>> rows = await db.query(tableName);
 
-    return [
-      for (final row in rows)
-        TransactionModel(
-          id: row['id'] as int,
-          userId: row['user_id'] as int,
-          amountCents: row['amount_cents'] as int,
-          category: row['category'] as String,
-          paymentMethodId: row['payment_method_id'] as int,
-          notes: row['notes'] as String,
-          time: row['datetime'] as String,
-        ),
-    ];
+    return rows.map((r) => TransactionModel.fromJson(r)).toList();
   }
 
   /// Update a transaction in the database.
   Future<void> updateDog(TransactionModel t) async {
     await db.update(
       tableName,
-      t.toMap(),
+      t.toJson(),
       // Ensure we replace the entry with the same id.
       where: 'id = ?',
       // Arguments to populate in the where clause.
