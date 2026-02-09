@@ -1,6 +1,11 @@
+import 'package:flutter_app/src/generic/result.dart';
 import 'package:flutter_app/src/sql/sql_service.dart';
 import 'package:flutter_app/src/transaction/transaction_model.dart';
 import 'package:sqflite/sqflite.dart';
+
+abstract interface class ITransactionRepository<E> {
+  Future<Result<List<TransactionModel>, E>> getTransactions();
+}
 
 class TransactionRepository extends SqlService {
   static String get tableName => 'transactions';

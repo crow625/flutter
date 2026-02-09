@@ -15,7 +15,7 @@ PostgreSQL database
 - category (text)
 - payment_method_id (int)
 - notes (text)
-- datetime (int8)
+- datetime (int8) (millis since epoch)
 
 ## Payment Methods
 - *id (int)

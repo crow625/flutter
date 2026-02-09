@@ -64,10 +64,31 @@ class SqfliteDatabase implements ISqlDatabase<Map<String, Object?>> {
 
   @override
   Future<Result<List<Map<String, Object?>>, SqlError>> query(
-      String tableName) async {
+    String tableName, {
+    bool? distinct,
+    List<String>? columns,
+    String? where,
+    List<Object?>? whereArgs,
+    String? groupBy,
+    String? having,
+    String? orderBy,
+    int? limit,
+    int? offset,
+  }) async {
     if (!_initialized) return const Result.error(_notInitialized);
     try {
-      final values = await db.query(tableName);
+      final values = await db.query(
+        tableName,
+        distinct: distinct,
+        columns: columns,
+        where: where,
+        whereArgs: whereArgs,
+        groupBy: groupBy,
+        having: having,
+        orderBy: orderBy,
+        limit: limit,
+        offset: offset,
+      );
       return Result.success(values);
     } catch (e) {
       return Result.error(SqlError("Failed to query: $e"));
