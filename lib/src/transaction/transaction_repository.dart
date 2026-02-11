@@ -4,6 +4,7 @@ import 'package:flutter_app/src/transaction/transaction_model.dart';
 import 'package:sqflite/sqflite.dart';
 
 abstract interface class ITransactionRepository<E> {
+  Future<Result<void, E>> createTable();
   Future<Result<List<TransactionModel>, E>> getTransactions();
 }
 

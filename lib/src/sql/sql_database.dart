@@ -23,4 +23,6 @@ abstract interface class ISqlDatabase<T> {
   });
 
   Future<Result<void, SqlError>> dispose();
+
+  Future<Result<void, SqlError>> destroy();
 }

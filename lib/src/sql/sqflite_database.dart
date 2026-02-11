@@ -94,4 +94,14 @@ class SqfliteDatabase implements ISqlDatabase<Map<String, Object?>> {
       return Result.error(SqlError("Failed to query: $e"));
     }
   }
+
+  @override
+  Future<Result<void, SqlError>> destroy() async {
+    try {
+      await deleteDatabase(path);
+      return const Result.success(null);
+    } catch (e) {
+      return Result.error(SqlError("Failed to destroy db: $e"));
+    }
+  }
 }

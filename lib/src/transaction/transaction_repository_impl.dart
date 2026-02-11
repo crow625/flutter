@@ -11,6 +11,16 @@ class SqlTransactionRepository implements ITransactionRepository<SqlError> {
   const SqlTransactionRepository(this.db, {this.tableName = 'transactions'});
 
   @override
+  Future<Result<void, SqlError>> createTable() async {
+    try {
+      return await db.execute(
+          "CREATE TABLE $tableName(id INTEGER PRIMARY KEY, user_id INTEGER PRIMARY KEY, amount_cents INTEGER, category TEXT, payment_method_id INTEGER, notes TEXT, datetime TEXT)");
+    } catch (e) {
+      return const Result.error(SqlError('Failed to create table.'));
+    }
+  }
+
+  @override
   Future<Result<List<TransactionModel>, SqlError>> getTransactions({
     String? userId,
     DateTime? startDate,
