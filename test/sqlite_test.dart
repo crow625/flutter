@@ -31,4 +31,67 @@ void main() async {
       {'id': 0}
     ]);
   });
+
+  group('query', () {
+    const tableName = 'query_test';
+
+    setUp(() async {
+      final r = await db.execute(
+          'CREATE TABLE $tableName(id INTEGER PRIMARY KEY, value INTEGER)');
+      expect(r.error, null);
+
+      var r2 = await db.insert(tableName, {'id': 0, 'value': 10});
+      expect(r2.error, null);
+      r2 = await db.insert(tableName, {'id': 1, 'value': 20});
+      expect(r2.error, null);
+      r2 = await db.insert(tableName, {'id': 2, 'value': 30});
+      expect(r2.error, null);
+    });
+
+    test('where', () async {
+      var r = await db.query(tableName, where: 'value > ?', whereArgs: [15]);
+      expect(r.error, isNull);
+      expect(r.value, [
+        {'id': 1, 'value': 20},
+        {'id': 2, 'value': 30},
+      ]);
+    });
+
+    test('columns', () async {
+      var r = await db.query(tableName, columns: ['value']);
+      expect(r.error, isNull);
+      expect(r.value, [
+        {'value': 10},
+        {'value': 20},
+        {'value': 30},
+      ]);
+    });
+
+    test('orderBy', () async {
+      var r = await db.query(tableName, orderBy: 'value DESC');
+      expect(r.error, isNull);
+      expect(r.value, [
+        {'id': 2, 'value': 30},
+        {'id': 1, 'value': 20},
+        {'id': 0, 'value': 10},
+      ]);
+    });
+
+    test('limit', () async {
+      var r = await db.query(tableName, limit: 1);
+      expect(r.error, isNull);
+      expect(r.value, [
+        {'id': 0, 'value': 10},
+      ]);
+    });
+
+    test('offset', () async {
+      var r = await db.query(tableName, offset: 1);
+      expect(r.error, isNull);
+      expect(r.value, [
+        {'id': 1, 'value': 20},
+        {'id': 2, 'value': 30},
+      ]);
+    });
+  });
 }

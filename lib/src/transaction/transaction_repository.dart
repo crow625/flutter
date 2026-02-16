@@ -5,7 +5,13 @@ import 'package:sqflite/sqflite.dart';
 
 abstract interface class ITransactionRepository<E> {
   Future<Result<void, E>> createTable();
-  Future<Result<List<TransactionModel>, E>> getTransactions();
+  Future<Result<TransactionModel, E>> createTransaction(TransactionModel t);
+  Future<Result<List<TransactionModel>, E>> getTransactions({
+    String? userId,
+    DateTime? startDate,
+    DateTime? endDate,
+  });
+  // add update and delete
 }
 
 class TransactionRepository extends SqlService {

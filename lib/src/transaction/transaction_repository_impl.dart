@@ -1,3 +1,4 @@
+import 'package:flutter_app/src/generic/date_time_converter.dart';
 import 'package:flutter_app/src/generic/result.dart';
 import 'package:flutter_app/src/sql/sql_database.dart';
 import 'package:flutter_app/src/sql/sql_error.dart';
@@ -14,9 +15,24 @@ class SqlTransactionRepository implements ITransactionRepository<SqlError> {
   Future<Result<void, SqlError>> createTable() async {
     try {
       return await db.execute(
-          "CREATE TABLE $tableName(id INTEGER PRIMARY KEY, user_id INTEGER PRIMARY KEY, amount_cents INTEGER, category TEXT, payment_method_id INTEGER, notes TEXT, datetime TEXT)");
+          "CREATE TABLE $tableName(id INTEGER PRIMARY KEY, user_id INTEGER PRIMARY KEY, amount_cents INTEGER, category TEXT, payment_method_id INTEGER, notes TEXT, time INTEGER)");
     } catch (e) {
-      return const Result.error(SqlError('Failed to create table.'));
+      return Result.error(SqlError('Failed to create table: $e'));
+    }
+  }
+
+  @override
+  Future<Result<TransactionModel, SqlError>> createTransaction(
+      TransactionModel t) async {
+    try {
+      final r = await db.insert(tableName, t);
+      if (r.hasValue) {
+        final id = r.value!;
+        return Result.success(t.copyWith(id: id));
+      }
+      return Result.error(r.error);
+    } catch (e) {
+      return Result.error(SqlError('Failed to create transaction: $e'));
     }
   }
 
@@ -26,15 +42,24 @@ class SqlTransactionRepository implements ITransactionRepository<SqlError> {
     DateTime? startDate,
     DateTime? endDate,
   }) {
-    // userId != null:
-    // WHERE user_id = {userId}
+    final where = <String>[];
+    final whereArgs = <Object?>[];
 
-    // startDate != null:
-    // WHERE time > {startDate}
+    if (userId != null) {
+      where.add('user_id = ?');
+      whereArgs.add(userId);
+    }
 
-    // endDate != null:
-    // WHERE time < {endDate}
+    if (startDate != null) {
+      where.add('time > ?');
+      whereArgs.add(const DateTimeMillisConverter().toJson(startDate));
+    }
 
-    return db.query(tableName);
+    if (endDate != null) {
+      where.add('time < ?');
+      whereArgs.add(const DateTimeMillisConverter().toJson(endDate));
+    }
+
+    return db.query(tableName, where: where.join(', '), whereArgs: whereArgs);
   }
 }

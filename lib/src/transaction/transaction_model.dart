@@ -3,6 +3,10 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'transaction_model.g.dart';
 
+class TransactionModelId {
+  static const none = 0;
+}
+
 @JsonSerializable()
 class TransactionModel {
   final int id;
@@ -33,8 +37,37 @@ class TransactionModel {
     required this.time,
   });
 
+  TransactionModel.initial({
+    required this.userId,
+    required this.amountCents,
+    required this.category,
+    required this.paymentMethodId,
+    required this.notes,
+    required this.time,
+  }) : id = TransactionModelId.none;
+
   factory TransactionModel.fromJson(Map<String, Object?> json) =>
       _$TransactionModelFromJson(json);
 
   Map<String, Object?> toJson() => _$TransactionModelToJson(this);
+
+  TransactionModel copyWith({
+    int? id,
+    int? userId,
+    int? amountCents,
+    String? category,
+    int? paymentMethodId,
+    String? notes,
+    DateTime? time,
+  }) {
+    return TransactionModel(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      amountCents: amountCents ?? this.amountCents,
+      category: category ?? this.category,
+      paymentMethodId: paymentMethodId ?? this.paymentMethodId,
+      notes: notes ?? this.notes,
+      time: time ?? this.time,
+    );
+  }
 }

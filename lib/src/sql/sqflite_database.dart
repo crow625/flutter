@@ -51,12 +51,12 @@ class SqfliteDatabase implements ISqlDatabase<Map<String, Object?>> {
   }
 
   @override
-  Future<Result<void, SqlError>> insert(
+  Future<Result<int, SqlError>> insert(
       String tableName, Map<String, Object?> values) async {
     if (!_initialized) return const Result.error(_notInitialized);
     try {
-      await db.insert(tableName, values);
-      return const Result.success(null);
+      final id = await db.insert(tableName, values);
+      return Result.success(id);
     } catch (e) {
       return Result.error(SqlError("Failed to insert: $e"));
     }
