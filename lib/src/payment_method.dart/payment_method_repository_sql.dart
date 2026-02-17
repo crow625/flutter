@@ -15,7 +15,7 @@ class SqlPaymentMethodRepository implements IPaymentMethodRepository<SqlError> {
   Future<Result<void, SqlError>> createTable() async {
     try {
       return await db.execute(
-          "CREATE TABLE $tableName(id INTEGER PRIMARY KEY, user_id INTEGER PRIMARY KEY, name TEXT)");
+          "CREATE TABLE $tableName(id INTEGER PRIMARY KEY, user_id INTEGER, name TEXT)");
     } catch (e) {
       return Result.error(SqlError('Failed to create table: $e'));
     }
@@ -48,8 +48,11 @@ class SqlPaymentMethodRepository implements IPaymentMethodRepository<SqlError> {
         whereArgs.add(userId);
       }
 
-      final r = await db.query(tableName,
-          where: where.join(', '), whereArgs: whereArgs);
+      final r = await db.query(
+        tableName,
+        where: where.isEmpty ? null : where.join(', '),
+        whereArgs: whereArgs.isEmpty ? null : whereArgs,
+      );
       if (r.hasValue) {
         final rows =
             r.value!.map((t) => PaymentMethodModel.fromJson(t)).toList();

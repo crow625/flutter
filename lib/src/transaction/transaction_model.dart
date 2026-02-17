@@ -37,7 +37,7 @@ class TransactionModel {
     required this.time,
   });
 
-  TransactionModel.initial({
+  const TransactionModel.initial({
     required this.userId,
     required this.amountCents,
     required this.category,

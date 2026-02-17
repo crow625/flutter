@@ -15,7 +15,7 @@ class SqlTransactionRepository implements ITransactionRepository<SqlError> {
   Future<Result<void, SqlError>> createTable() async {
     try {
       return await db.execute(
-          "CREATE TABLE $tableName(id INTEGER PRIMARY KEY, user_id INTEGER PRIMARY KEY, amount_cents INTEGER, category TEXT, payment_method_id INTEGER, notes TEXT, time INTEGER)");
+          "CREATE TABLE $tableName(id INTEGER PRIMARY KEY, user_id INTEGER, amount_cents INTEGER, category TEXT, payment_method_id INTEGER, notes TEXT, time INTEGER)");
     } catch (e) {
       return Result.error(SqlError('Failed to create table: $e'));
     }
@@ -61,8 +61,11 @@ class SqlTransactionRepository implements ITransactionRepository<SqlError> {
         whereArgs.add(const DateTimeMillisConverter().toJson(endDate));
       }
 
-      final r = await db.query(tableName,
-          where: where.join(', '), whereArgs: whereArgs);
+      final r = await db.query(
+        tableName,
+        where: where.isEmpty ? null : where.join(', '),
+        whereArgs: whereArgs.isEmpty ? null : whereArgs,
+      );
       if (r.hasValue) {
         final rows = r.value!.map((t) => TransactionModel.fromJson(t)).toList();
         return Result.success(rows);

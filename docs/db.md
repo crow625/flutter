@@ -10,7 +10,7 @@ PostgreSQL database
 
 ## Transactions
 - *id (int)
-- *user_id (int)
+- user_id (int) (foreign key Users)
 - amount_cents (int)
 - category (text)
 - payment_method_id (int)
@@ -19,5 +19,5 @@ PostgreSQL database
 
 ## Payment Methods
 - *id (int)
-- *user_id (int)
+- user_id (int) (foreign key Users)
 - name (text)

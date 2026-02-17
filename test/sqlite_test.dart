@@ -11,7 +11,7 @@ void main() async {
   databaseFactory = databaseFactoryFfi;
 
   setUp(() async {
-    db = SqfliteDatabase(_dbName);
+    db = SqfliteDatabase(_dbName, version: 1);
     final r = await db.init();
     expect(r.error, isNull);
   });

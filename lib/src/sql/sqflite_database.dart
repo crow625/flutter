@@ -7,11 +7,12 @@ const _notInitialized = SqlError("Database not initialized.");
 
 class SqfliteDatabase implements ISqlDatabase<Map<String, Object?>> {
   final String path;
+  final int version;
   late final Database db;
 
   bool _initialized = false;
 
-  SqfliteDatabase(this.path);
+  SqfliteDatabase(this.path, {required this.version});
 
   @override
   Future<Result<void, SqlError>> dispose() async {
