@@ -1,62 +1,32 @@
 import 'package:flutter_app/src/generic/result.dart';
-import 'package:flutter_app/src/sql/sql_service.dart';
 import 'package:flutter_app/src/transaction/transaction_model.dart';
-import 'package:sqflite/sqflite.dart';
 
 abstract interface class ITransactionRepository<E> {
+  /// Create the transaction table.
   Future<Result<void, E>> createTable();
+
+  /// Create a new transaction.
+  ///
+  /// It is expected that the supplied TransactionModel will use [TransactionModelId.none] for its id.
+  /// The returned [TransactionModel] will use the id assigned by the database.
   Future<Result<TransactionModel, E>> createTransaction(TransactionModel t);
+
+  /// Get all transactions that meet the supplied parameters.
+  ///
+  /// - [userId] - Include only transactions for this userId.
+  /// - [startDate] - Include only transactions after this date.
+  /// - [endDate] - Include only transactions before this date.
   Future<Result<List<TransactionModel>, E>> getTransactions({
     String? userId,
     DateTime? startDate,
     DateTime? endDate,
   });
-  // add update and delete
-}
 
-class TransactionRepository extends SqlService {
-  static String get tableName => 'transactions';
-  static String get dbFilePath => 'transactions_database.db';
+  /// Update a transaction with new parameters.
+  ///
+  /// The change will be applied to the transaction with the matching id.
+  Future<Result<int, E>> updateTransaction(TransactionModel t);
 
-  Future<void> onCreate(Database db, int version) async {
-    return db.execute(
-        "CREATE TABLE $tableName(id INTEGER PRIMARY KEY, user_id INTEGER PRIMARY KEY, amount_cents INTEGER, category TEXT, payment_method_id INTEGER, notes TEXT, datetime TEXT)");
-  }
-
-  /// Insert a new transaction into the database.
-  Future<void> insertTransaction(TransactionModel t) async {
-    await db.insert(
-      tableName,
-      t.toJson(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
-
-  /// Get all transactions in the database.
-  Future<List<TransactionModel>> getTransactions() async {
-    final List<Map<String, Object?>> rows = await db.query(tableName);
-
-    return rows.map((r) => TransactionModel.fromJson(r)).toList();
-  }
-
-  /// Update a transaction in the database.
-  Future<void> updateDog(TransactionModel t) async {
-    await db.update(
-      tableName,
-      t.toJson(),
-      // Ensure we replace the entry with the same id.
-      where: 'id = ?',
-      // Arguments to populate in the where clause.
-      whereArgs: [t.id],
-    );
-  }
-
-  /// Delete the transaction with the given id from the database.
-  Future<void> deleteDog(int id) async {
-    await db.delete(
-      tableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-  }
+  /// Delete the transaction with the provided id.
+  Future<Result<int, E>> deleteTransaction(int id);
 }

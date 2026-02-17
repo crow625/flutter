@@ -96,6 +96,42 @@ class SqfliteDatabase implements ISqlDatabase<Map<String, Object?>> {
   }
 
   @override
+  Future<Result<int, SqlError>> update(
+    String tableName,
+    Map<String, Object?> value, {
+    String? where,
+    List<Object?>? whereArgs,
+  }) async {
+    if (!_initialized) return const Result.error(_notInitialized);
+    try {
+      final count = await db.update(
+        tableName,
+        value,
+        where: where,
+        whereArgs: whereArgs,
+      );
+      return Result.success(count);
+    } catch (e) {
+      return Result.error(SqlError("Failed to update: $e"));
+    }
+  }
+
+  @override
+  Future<Result<int, SqlError>> delete(
+    String tableName, {
+    String? where,
+    List<Object?>? whereArgs,
+  }) async {
+    try {
+      final count =
+          await db.delete(tableName, where: where, whereArgs: whereArgs);
+      return Result.success(count);
+    } catch (e) {
+      return Result.error(SqlError("Failed to delete: $e"));
+    }
+  }
+
+  @override
   Future<Result<void, SqlError>> destroy() async {
     try {
       await deleteDatabase(path);

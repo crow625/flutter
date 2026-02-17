@@ -22,6 +22,19 @@ abstract interface class ISqlDatabase<T> {
     int? offset,
   });
 
+  Future<Result<int, SqlError>> update(
+    String tableName,
+    T value, {
+    String? where,
+    List<Object?>? whereArgs,
+  });
+
+  Future<Result<int, SqlError>> delete(
+    String tableName, {
+    String? where,
+    List<Object?>? whereArgs,
+  });
+
   Future<Result<void, SqlError>> dispose();
 
   Future<Result<void, SqlError>> destroy();

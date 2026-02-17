@@ -7,7 +7,7 @@ import 'package:flutter_app/src/transaction/transaction_repository.dart';
 
 class SqlTransactionRepository implements ITransactionRepository<SqlError> {
   final String tableName;
-  final ISqlDatabase<TransactionModel> db;
+  final ISqlDatabase<Map<String, Object?>> db;
 
   const SqlTransactionRepository(this.db, {this.tableName = 'transactions'});
 
@@ -25,7 +25,7 @@ class SqlTransactionRepository implements ITransactionRepository<SqlError> {
   Future<Result<TransactionModel, SqlError>> createTransaction(
       TransactionModel t) async {
     try {
-      final r = await db.insert(tableName, t);
+      final r = await db.insert(tableName, t.toJson());
       if (r.hasValue) {
         final id = r.value!;
         return Result.success(t.copyWith(id: id));
@@ -41,25 +41,62 @@ class SqlTransactionRepository implements ITransactionRepository<SqlError> {
     String? userId,
     DateTime? startDate,
     DateTime? endDate,
-  }) {
-    final where = <String>[];
-    final whereArgs = <Object?>[];
+  }) async {
+    try {
+      final where = <String>[];
+      final whereArgs = <Object?>[];
 
-    if (userId != null) {
-      where.add('user_id = ?');
-      whereArgs.add(userId);
+      if (userId != null) {
+        where.add('user_id = ?');
+        whereArgs.add(userId);
+      }
+
+      if (startDate != null) {
+        where.add('time > ?');
+        whereArgs.add(const DateTimeMillisConverter().toJson(startDate));
+      }
+
+      if (endDate != null) {
+        where.add('time < ?');
+        whereArgs.add(const DateTimeMillisConverter().toJson(endDate));
+      }
+
+      final r = await db.query(tableName,
+          where: where.join(', '), whereArgs: whereArgs);
+      if (r.hasValue) {
+        final rows = r.value!.map((t) => TransactionModel.fromJson(t)).toList();
+        return Result.success(rows);
+      }
+      return Result.error(r.error);
+    } catch (e) {
+      return Result.error(SqlError('Failed to get transactions: $e'));
     }
+  }
 
-    if (startDate != null) {
-      where.add('time > ?');
-      whereArgs.add(const DateTimeMillisConverter().toJson(startDate));
+  @override
+  Future<Result<int, SqlError>> updateTransaction(TransactionModel t) async {
+    try {
+      final r = await db
+          .update(tableName, t.toJson(), where: 'id = ?', whereArgs: [t.id]);
+      if (r.hasValue) {
+        return Result.success(r.value!);
+      }
+      return Result.error(r.error);
+    } catch (e) {
+      return Result.error(SqlError('Failed to update transaction: $e'));
     }
+  }
 
-    if (endDate != null) {
-      where.add('time < ?');
-      whereArgs.add(const DateTimeMillisConverter().toJson(endDate));
+  @override
+  Future<Result<int, SqlError>> deleteTransaction(int id) async {
+    try {
+      final r = await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
+      if (r.hasValue) {
+        return Result.success(r.value!);
+      }
+      return Result.error(r.error);
+    } catch (e) {
+      return Result.error(SqlError('Failed to delete transaction: $e'));
     }
-
-    return db.query(tableName, where: where.join(', '), whereArgs: whereArgs);
   }
 }

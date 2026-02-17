@@ -4,7 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'transaction_model.g.dart';
 
 class TransactionModelId {
-  static const none = 0;
+  static const none = -1;
 }
 
 @JsonSerializable()
