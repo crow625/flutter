@@ -2,6 +2,10 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'user_model.g.dart';
 
+class UserModelId {
+  static const none = -1;
+}
+
 @JsonSerializable()
 class UserModel {
   final int id;
