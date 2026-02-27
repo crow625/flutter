@@ -22,6 +22,9 @@ abstract interface class ITransactionRepository<E> {
     DateTime? endDate,
   });
 
+  /// Get the transaction with the specified ID.
+  Future<Result<TransactionModel, E>> getTransaction(int id);
+
   /// Update a transaction with new parameters.
   ///
   /// The change will be applied to the transaction with the matching id.

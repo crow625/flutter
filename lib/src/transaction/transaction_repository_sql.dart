@@ -25,7 +25,7 @@ class SqlTransactionRepository implements ITransactionRepository<SqlError> {
   Future<Result<TransactionModel, SqlError>> createTransaction(
       TransactionModel t) async {
     try {
-      final r = await db.insert(tableName, t.toJson());
+      final r = await db.insert(tableName, t.toJson()..remove('id'));
       if (r.hasValue) {
         final id = r.value!;
         return Result.success(t.copyWith(id: id));
@@ -73,6 +73,24 @@ class SqlTransactionRepository implements ITransactionRepository<SqlError> {
       return Result.error(r.error);
     } catch (e) {
       return Result.error(SqlError('Failed to get transactions: $e'));
+    }
+  }
+
+  @override
+  Future<Result<TransactionModel, SqlError>> getTransaction(int id) async {
+    try {
+      final r = await db.query(tableName, where: 'id = ?', whereArgs: [id]);
+      if (r.hasValue) {
+        if (r.value!.isNotEmpty) {
+          final t = TransactionModel.fromJson(r.value!.first);
+          return Result.success(t);
+        } else {
+          return Result.error(SqlError('Transaction with id $id not found.'));
+        }
+      }
+      return Result.error(r.error);
+    } catch (e) {
+      return Result.error(SqlError('Failed to get transaction: $e'));
     }
   }
 
