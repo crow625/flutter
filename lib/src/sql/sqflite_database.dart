@@ -1,7 +1,7 @@
 import 'package:flutter_app/src/generic/result.dart';
 import 'package:flutter_app/src/sql/sql_database.dart';
 import 'package:flutter_app/src/sql/sql_error.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 const _notInitialized = SqlError("Database not initialized.");
 
