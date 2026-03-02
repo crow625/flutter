@@ -19,6 +19,11 @@ class PaymentMethodModel {
     required this.name,
   });
 
+  const PaymentMethodModel.initial({
+    required this.userId,
+    required this.name,
+  }) : id = PaymentMethodModelId.none;
+
   factory PaymentMethodModel.fromJson(Map<String, Object?> json) =>
       _$PaymentMethodModelFromJson(json);
 

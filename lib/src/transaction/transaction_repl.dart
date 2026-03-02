@@ -1,10 +1,11 @@
+import 'package:flutter_app/src/payment_method/payment_method_model.dart';
 import 'package:flutter_app/src/transaction/transaction_model.dart';
 import 'package:flutter_app/src/transaction/transaction_repository.dart';
 
 // Planned commands:
 // X createTransaction
 // X getTransaction
-// getTransactionsList
+// X getTransactionsList
 // updateTransaction
 // createPaymentMethod
 // getPaymentMethod
@@ -77,6 +78,31 @@ class TransactionRepl {
           return 'Invalid id: $id';
         }
         return 'Provide a transaction id to retrieve';
+
+      case 'getTransactionsList':
+        final r = await repo.getTransactions();
+        if (r.hasValue) {
+          return r.value!.map((t) => t.toJson().toString()).join('\n');
+        }
+        return 'Error getting transactions: ${r.error}';
+
+      case 'updateTransaction':
+        return 'Unsupported';
+
+      case 'createPaymentMethod':
+        if (words.length > 2) {
+          final userId = int.tryParse(words[1]);
+          final name = words[2];
+          if (userId != null) {
+            final p = PaymentMethodModel.initial(
+              userId: userId,
+              name: name,
+            );
+            // PaymentMethodRepository doesn't exist yet!
+            return 'PaymentMethodRepository not implemented';
+          }
+        }
+        return 'Failed to parse arguments';
 
       default:
         return 'Unrecognized command';

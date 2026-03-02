@@ -1,6 +1,6 @@
 import 'package:flutter_app/src/generic/result.dart';
-import 'package:flutter_app/src/payment_method.dart/payment_method_model.dart';
-import 'package:flutter_app/src/payment_method.dart/payment_method_repository.dart';
+import 'package:flutter_app/src/payment_method/payment_method_model.dart';
+import 'package:flutter_app/src/payment_method/payment_method_repository.dart';
 import 'package:flutter_app/src/sql/sql_database.dart';
 import 'package:flutter_app/src/sql/sql_error.dart';
 
