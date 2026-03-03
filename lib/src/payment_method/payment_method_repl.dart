@@ -56,7 +56,41 @@ class PaymentMethodRepl {
         return 'Error getting payment methods: ${r.error}';
 
       case 'update':
-        return 'Unsupported';
+        if (args.length > 3) {
+          final id = int.tryParse(args[1]);
+          if (id != null) {
+            final r = await repo.getPaymentMethod(id);
+            if (r.hasValue) {
+              PaymentMethodModel newMethod;
+              final p = r.value!;
+              final field = args[2];
+              switch (field) {
+                case 'userId':
+                  final userId = int.tryParse(args[3]);
+                  if (userId != null) {
+                    newMethod = p.copyWith(userId: userId);
+                    break;
+                  }
+                  return 'Invalid userId $userId';
+                case 'name':
+                  final name = args[3];
+                  newMethod = p.copyWith(name: name);
+                  break;
+                default:
+                  return 'Unrecognized payment method field $field';
+              }
+
+              final r2 = await repo.updatePaymentMethod(newMethod);
+              if (r2.hasValue) {
+                return 'Successfully updated $field for payment method';
+              }
+              return 'Failed to update $field for payment method: ${r2.error}';
+            }
+            return 'Failed to get existing payment method $id: ${r.error}';
+          }
+          return 'Provide a payment method id to update';
+        }
+        return 'Not enough arguments: <id> <field> <newValue>';
 
       case 'delete':
         if (args.length > 1) {
