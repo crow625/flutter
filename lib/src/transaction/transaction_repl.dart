@@ -75,7 +75,61 @@ class TransactionRepl {
         return 'Error getting transactions: ${r.error}';
 
       case 'update':
-        return 'Unsupported';
+        if (args.length > 3) {
+          final id = int.tryParse(args[1]);
+          if (id != null) {
+            final r = await repo.getTransaction(id);
+            if (r.hasValue) {
+              TransactionModel newTransaction;
+              final t = r.value!;
+              final field = args[2];
+              switch (field) {
+                case 'userId':
+                  final userId = int.tryParse(args[3]);
+                  if (userId != null) {
+                    newTransaction = t.copyWith(userId: userId);
+                    break;
+                  }
+                  return 'Invalid userId $userId';
+                case 'amountCents':
+                  final amountCents = int.tryParse(args[3]);
+                  if (amountCents != null) {
+                    newTransaction = t.copyWith(amountCents: amountCents);
+                    break;
+                  }
+                  return 'Invalid amount $amountCents';
+                case 'category':
+                  final category = args[3];
+                  newTransaction = t.copyWith(category: category);
+                  break;
+                case 'paymentMethodId':
+                  final paymentMethodId = int.tryParse(args[3]);
+                  if (paymentMethodId != null) {
+                    newTransaction =
+                        t.copyWith(paymentMethodId: paymentMethodId);
+                    break;
+                  }
+                  return 'Invalid paymentMethodId $paymentMethodId';
+                case 'notes':
+                  final notes = args[3];
+                  newTransaction = t.copyWith(notes: notes);
+                  break;
+                // Time not supported for now...
+                default:
+                  return 'Unrecognized transaction field $field';
+              }
+
+              final r2 = await repo.updateTransaction(newTransaction);
+              if (r2.hasValue) {
+                return 'Successfully updated $field for transaction';
+              }
+              return 'Failed to update $field for transaction: ${r2.error}';
+            }
+            return 'Failed to get existing transaction $id: ${r.error}';
+          }
+          return 'Provide a transaction id to update';
+        }
+        return 'Not enough arguments: <id> <field> <newValue>';
 
       case 'delete':
         if (args.length > 1) {
