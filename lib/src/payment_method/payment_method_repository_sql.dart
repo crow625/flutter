@@ -15,7 +15,7 @@ class SqlPaymentMethodRepository implements IPaymentMethodRepository<SqlError> {
   Future<Result<void, SqlError>> createTable() async {
     try {
       return await db.execute(
-          "CREATE TABLE $tableName(id INTEGER PRIMARY KEY, user_id INTEGER, name TEXT)");
+          "CREATE TABLE IF NOT EXISTS $tableName(id INTEGER PRIMARY KEY, user_id INTEGER, name TEXT)");
     } catch (e) {
       return Result.error(SqlError('Failed to create table: $e'));
     }
@@ -23,12 +23,12 @@ class SqlPaymentMethodRepository implements IPaymentMethodRepository<SqlError> {
 
   @override
   Future<Result<PaymentMethodModel, SqlError>> createPaymentMethod(
-      PaymentMethodModel t) async {
+      PaymentMethodModel p) async {
     try {
-      final r = await db.insert(tableName, t.toJson());
+      final r = await db.insert(tableName, p.toJson()..remove('id'));
       if (r.hasValue) {
         final id = r.value!;
-        return Result.success(t.copyWith(id: id));
+        return Result.success(p.copyWith(id: id));
       }
       return Result.error(r.error);
     } catch (e) {
@@ -65,11 +65,30 @@ class SqlPaymentMethodRepository implements IPaymentMethodRepository<SqlError> {
   }
 
   @override
+  Future<Result<PaymentMethodModel, SqlError>> getPaymentMethod(int id) async {
+    try {
+      final r = await db.query(tableName, where: 'id = ?', whereArgs: [id]);
+      if (r.hasValue) {
+        if (r.value!.isNotEmpty) {
+          final p = PaymentMethodModel.fromJson(r.value!.first);
+          return Result.success(p);
+        } else {
+          return Result.error(
+              SqlError('Payment method with id $id not found.'));
+        }
+      }
+      return Result.error(r.error);
+    } catch (e) {
+      return Result.error(SqlError('Failed to get payment method: $e'));
+    }
+  }
+
+  @override
   Future<Result<int, SqlError>> updatePaymentMethod(
-      PaymentMethodModel t) async {
+      PaymentMethodModel p) async {
     try {
       final r = await db
-          .update(tableName, t.toJson(), where: 'id = ?', whereArgs: [t.id]);
+          .update(tableName, p.toJson(), where: 'id = ?', whereArgs: [p.id]);
       if (r.hasValue) {
         return Result.success(r.value!);
       }

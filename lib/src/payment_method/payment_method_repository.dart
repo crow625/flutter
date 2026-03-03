@@ -10,7 +10,7 @@ abstract interface class IPaymentMethodRepository<E> {
   /// It is expected that the supplied PaymentMethodModel will use [PaymentMethodModelId.none] for its id.
   /// The returned [PaymentMethodModel] will use the id assigned by the database.
   Future<Result<PaymentMethodModel, E>> createPaymentMethod(
-      PaymentMethodModel t);
+      PaymentMethodModel p);
 
   /// Get all payment methods that meet the supplied parameters.
   ///
@@ -18,10 +18,13 @@ abstract interface class IPaymentMethodRepository<E> {
   Future<Result<List<PaymentMethodModel>, E>> getPaymentMethods(
       {String? userId});
 
+  /// Get the payment method with the specified ID.
+  Future<Result<PaymentMethodModel, E>> getPaymentMethod(int id);
+
   /// Update a payment method with new parameters.
   ///
   /// The change will be applied to the payment method with the matching id.
-  Future<Result<int, E>> updatePaymentMethod(PaymentMethodModel t);
+  Future<Result<int, E>> updatePaymentMethod(PaymentMethodModel p);
 
   /// Delete the payment method with the provided id.
   Future<Result<int, E>> deletePaymentMethod(int id);

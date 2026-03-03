@@ -1,42 +1,29 @@
-import 'package:flutter_app/src/payment_method/payment_method_model.dart';
 import 'package:flutter_app/src/transaction/transaction_model.dart';
 import 'package:flutter_app/src/transaction/transaction_repository.dart';
 
-// Planned commands:
-// X createTransaction
-// X getTransaction
-// X getTransactionsList
-// updateTransaction
-// createPaymentMethod
-// getPaymentMethod
-// getPaymentMethodsList
-// updatePaymentMethod
+//create
+// get
+// getList
+// update
+// delete
 
 class TransactionRepl {
   final ITransactionRepository repo;
 
   TransactionRepl(this.repo);
 
-  Future<String> handleInput(String input) async {
-    final trimmed = input.trim();
-
-    if (trimmed.isEmpty) {
-      return "Please provide an input.";
-    }
-
-    final words = trimmed.split(' ');
-
-    switch (words.first) {
-      case 'createTransaction':
-        if (words.length > 5) {
-          final userId = int.tryParse(words[1]);
-          final amountCents = int.tryParse(words[2]);
-          final category = words[3];
-          final paymentMethodId = int.tryParse(words[4]);
-          final notes = words[5];
+  Future<String> handleInput(List<String> args) async {
+    switch (args.first) {
+      case 'create':
+        if (args.length > 5) {
+          final userId = int.tryParse(args[1]);
+          final amountCents = int.tryParse(args[2]);
+          final category = args[3];
+          final paymentMethodId = int.tryParse(args[4]);
+          final notes = args[5];
           DateTime time;
-          if (words.length > 6) {
-            final timeMillis = int.tryParse(words[6]);
+          if (args.length > 6) {
+            final timeMillis = int.tryParse(args[6]);
             if (timeMillis != null) {
               time = DateTime.fromMillisecondsSinceEpoch(timeMillis);
             } else {
@@ -65,9 +52,10 @@ class TransactionRepl {
           return 'Failed to parse arguments';
         }
         return 'No arguments provided';
-      case 'getTransaction':
-        if (words.length > 1) {
-          final id = int.tryParse(words[1]);
+
+      case 'get':
+        if (args.length > 1) {
+          final id = int.tryParse(args[1]);
           if (id != null) {
             final r = await repo.getTransaction(id);
             if (r.hasValue) {
@@ -79,30 +67,29 @@ class TransactionRepl {
         }
         return 'Provide a transaction id to retrieve';
 
-      case 'getTransactionsList':
+      case 'list':
         final r = await repo.getTransactions();
         if (r.hasValue) {
           return r.value!.map((t) => t.toJson().toString()).join('\n');
         }
         return 'Error getting transactions: ${r.error}';
 
-      case 'updateTransaction':
+      case 'update':
         return 'Unsupported';
 
-      case 'createPaymentMethod':
-        if (words.length > 2) {
-          final userId = int.tryParse(words[1]);
-          final name = words[2];
-          if (userId != null) {
-            final p = PaymentMethodModel.initial(
-              userId: userId,
-              name: name,
-            );
-            // PaymentMethodRepository doesn't exist yet!
-            return 'PaymentMethodRepository not implemented';
+      case 'delete':
+        if (args.length > 1) {
+          final id = int.tryParse(args[1]);
+          if (id != null) {
+            final r = await repo.deleteTransaction(id);
+            if (r.hasValue) {
+              return 'Deleted ${r.value!} transactions';
+            }
+            return 'Failed to delete transaction: ${r.error}';
           }
+          return 'Invalid id: $id';
         }
-        return 'Failed to parse arguments';
+        return 'Provide a transaction id to delete';
 
       default:
         return 'Unrecognized command';
