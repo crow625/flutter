@@ -13,6 +13,7 @@ TransactionModel initialFactory() {
     userId: 0,
     amountCents: 100,
     category: 'Groceries',
+    vendor: 'Grocery Store',
     paymentMethodId: 0,
     notes: 'Pasta dinner',
     time: now,

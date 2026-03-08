@@ -19,6 +19,8 @@ class TransactionModel {
 
   final String category;
 
+  final String vendor;
+
   @JsonKey(name: 'payment_method_id')
   final int paymentMethodId;
 
@@ -32,6 +34,7 @@ class TransactionModel {
     required this.userId,
     required this.amountCents,
     required this.category,
+    required this.vendor,
     required this.paymentMethodId,
     required this.notes,
     required this.time,
@@ -41,6 +44,7 @@ class TransactionModel {
     required this.userId,
     required this.amountCents,
     required this.category,
+    required this.vendor,
     required this.paymentMethodId,
     required this.notes,
     required this.time,
@@ -56,6 +60,7 @@ class TransactionModel {
     int? userId,
     int? amountCents,
     String? category,
+    String? vendor,
     int? paymentMethodId,
     String? notes,
     DateTime? time,
@@ -65,6 +70,7 @@ class TransactionModel {
       userId: userId ?? this.userId,
       amountCents: amountCents ?? this.amountCents,
       category: category ?? this.category,
+      vendor: vendor ?? this.vendor,
       paymentMethodId: paymentMethodId ?? this.paymentMethodId,
       notes: notes ?? this.notes,
       time: time ?? this.time,

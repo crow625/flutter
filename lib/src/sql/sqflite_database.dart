@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_app/src/generic/result.dart';
 import 'package:flutter_app/src/sql/sql_database.dart';
 import 'package:flutter_app/src/sql/sql_error.dart';
@@ -5,14 +7,18 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 const _notInitialized = SqlError("Database not initialized.");
 
+typedef SqfliteVersionChangeCallback = FutureOr<void> Function(
+    ISqlDatabase, int, int);
+
 class SqfliteDatabase implements ISqlDatabase<Map<String, Object?>> {
   final String path;
   final int version;
   late final Database db;
+  final SqfliteVersionChangeCallback? onVersionChange;
 
   bool _initialized = false;
 
-  SqfliteDatabase(this.path, {required this.version});
+  SqfliteDatabase(this.path, {required this.version, this.onVersionChange});
 
   @override
   Future<Result<void, SqlError>> dispose() async {
@@ -43,7 +49,15 @@ class SqfliteDatabase implements ISqlDatabase<Map<String, Object?>> {
       return const Result.error(SqlError("Database already initialized."));
     }
     try {
-      db = await openDatabase(path);
+      final versionChangeCallback = onVersionChange != null
+          ? (Database _, int old, int n) => onVersionChange!(this, old, n)
+          : null;
+      db = await openDatabase(
+        path,
+        version: version,
+        onUpgrade: versionChangeCallback,
+        onDowngrade: versionChangeCallback,
+      );
       _initialized = true;
       return const Result.success(null);
     } catch (e) {

@@ -19,11 +19,12 @@ class TransactionRepl {
           final userId = int.tryParse(args[1]);
           final amountCents = int.tryParse(args[2]);
           final category = args[3];
-          final paymentMethodId = int.tryParse(args[4]);
-          final notes = args[5];
+          final vendor = args[4];
+          final paymentMethodId = int.tryParse(args[5]);
+          final notes = args[6];
           DateTime time;
-          if (args.length > 6) {
-            final timeMillis = int.tryParse(args[6]);
+          if (args.length > 7) {
+            final timeMillis = int.tryParse(args[7]);
             if (timeMillis != null) {
               time = DateTime.fromMillisecondsSinceEpoch(timeMillis);
             } else {
@@ -39,6 +40,7 @@ class TransactionRepl {
               userId: userId,
               amountCents: amountCents,
               category: category,
+              vendor: vendor,
               paymentMethodId: paymentMethodId,
               notes: notes,
               time: time,
