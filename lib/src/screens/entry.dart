@@ -10,15 +10,17 @@ class Entry extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppScaffold(
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               Navigator.of(context)
                   .push(MaterialPageRoute(builder: (c) => const SignIn()));
             },
             child: const Text('Sign In'),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               Navigator.of(context)
                   .push(MaterialPageRoute(builder: (c) => const About()));
