@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/src/screens/about.dart';
 import 'package:flutter_app/src/screens/sign_in.dart';
+import 'package:flutter_app/src/widgets/scaffold.dart';
 
 class Entry extends StatelessWidget {
   const Entry({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return AppScaffold(
       body: Column(
         children: [
           TextButton(

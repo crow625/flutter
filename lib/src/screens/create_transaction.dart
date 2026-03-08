@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/src/widgets/scaffold.dart';
 
 class CreateTransaction extends StatelessWidget {
   const CreateTransaction({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return AppScaffold(
       body: Column(
         children: [
           const TextField(), // Amount (number input)

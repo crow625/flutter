@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/src/screens/home.dart';
+import 'package:flutter_app/src/widgets/scaffold.dart';
 
 class GuestDisclaimer extends StatelessWidget {
   const GuestDisclaimer({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return AppScaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

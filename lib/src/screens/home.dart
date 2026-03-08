@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/src/screens/create_payment_method.dart';
 import 'package:flutter_app/src/screens/create_transaction.dart';
 import 'package:flutter_app/src/screens/transaction_list.dart';
+import 'package:flutter_app/src/widgets/scaffold.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return AppScaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

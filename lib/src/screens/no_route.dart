@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/src/widgets/scaffold.dart';
 
 class NoRoute extends StatelessWidget {
   const NoRoute({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return AppScaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/src/screens/guest_disclaimer.dart';
 import 'package:flutter_app/src/screens/home.dart';
+import 'package:flutter_app/src/widgets/scaffold.dart';
 
 class SignIn extends StatelessWidget {
   const SignIn({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return AppScaffold(
       body: Column(
         children: [
           const TextField(), // Username
