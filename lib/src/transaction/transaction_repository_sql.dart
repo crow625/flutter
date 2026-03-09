@@ -15,7 +15,7 @@ class SqlTransactionRepository implements ITransactionRepository<SqlError> {
   Future<Result<void, SqlError>> createTable() async {
     try {
       return await db.execute(
-          "CREATE TABLE $tableName(id INTEGER PRIMARY KEY, user_id INTEGER, amount_cents INTEGER, category TEXT, payment_method_id INTEGER, notes TEXT, time INTEGER, vendor TEXT)");
+          "CREATE TABLE IF NOT EXISTS $tableName(id INTEGER PRIMARY KEY, user_id INTEGER, amount_cents INTEGER, category TEXT, payment_method_id INTEGER, notes TEXT, time INTEGER, vendor TEXT)");
     } catch (e) {
       return Result.error(SqlError('Failed to create table: $e'));
     }

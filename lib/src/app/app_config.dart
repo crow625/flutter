@@ -1,7 +1,13 @@
 class TransactionAppConfig {
-  final bool useLocalDb;
+  final String dbPath;
+  final int dbVersion;
+  final String transactionTableName;
+  final String paymentMethodTableName;
 
-  TransactionAppConfig({
-    required this.useLocalDb,
+  const TransactionAppConfig({
+    required this.dbPath,
+    required this.dbVersion,
+    required this.transactionTableName,
+    required this.paymentMethodTableName,
   });
 }

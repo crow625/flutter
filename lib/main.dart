@@ -1,11 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_app/src/app/app.dart';
+import 'package:flutter_app/src/app/app_config.dart';
 import 'package:flutter_app/src/screens/entry.dart';
+import 'package:path_provider/path_provider.dart';
 
-void main() {
+void main() async {
+  // UI initialization
   WidgetsFlutterBinding.ensureInitialized();
-
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+
+  // Repository initialization
+  final appDocDir = await getApplicationDocumentsDirectory();
+  final dbPath = '${appDocDir.path}/transactions.db';
+  final config = TransactionAppConfig(
+    dbPath: dbPath,
+    dbVersion: 1,
+    transactionTableName: 'transactions',
+    paymentMethodTableName: 'paymentMethods',
+  );
+
+  $app = TransactionApp(config);
+  final r = await $app.init();
+
+  if (r.isError) {
+    print("INITIALIZATION ERROR: ${r.error}");
+  } else {
+    print("INITIALIZATION SUCCESSFUL!");
+  }
 
   runApp(const MyApp());
 }
