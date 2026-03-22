@@ -1,34 +1,18 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_app/src/sql/sql_error.dart';
 import 'package:flutter_app/src/transaction/transaction_model.dart';
-import 'package:flutter_app/src/transaction/transaction_repository.dart';
+import 'package:flutter_app/src/transaction/transaction_repository_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-enum TransactionProviderState {
-  fetching,
-  gotTransactions,
-}
+final transactionsProvider =
+    AsyncNotifierProvider<TransactionsNotifier, List<TransactionModel>>(
+  TransactionsNotifier.new,
+);
 
-enum SortDirection {
-  ascending,
-  descending,
-  none;
-}
-
-class TransactionProvider extends ChangeNotifier {
-  final ITransactionRepository repo;
-
-  TransactionProvider(this.repo);
-
-  List<TransactionModel> transactions = [];
-  SqlError? error;
-
-  Future<void> getTransactions() async {
-    final r = await repo.getTransactions();
-    if (r.hasValue) {
-      transactions = r.value!;
-    } else {
-      error = r.error;
-    }
-    notifyListeners();
+class TransactionsNotifier extends AsyncNotifier<List<TransactionModel>> {
+  @override
+  Future<List<TransactionModel>> build() async {
+    final repo = ref.read(transactionRepositoryProvider);
+    final result = await repo.getTransactions();
+    if (result.hasError) throw result.error!;
+    return result.value!;
   }
 }

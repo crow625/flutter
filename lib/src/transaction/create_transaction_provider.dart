@@ -1,46 +1,41 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_app/src/transaction/transaction_model.dart';
-import 'package:flutter_app/src/transaction/transaction_repository.dart';
+import 'package:flutter_app/src/transaction/transaction_provider.dart';
+import 'package:flutter_app/src/transaction/transaction_repository_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CreateTransactionProvider extends ChangeNotifier {
-  final ITransactionRepository repo;
-  final TextEditingController amountController = TextEditingController();
-  final TextEditingController notesController = TextEditingController();
+final createTransactionProvider =
+    AsyncNotifierProvider<CreateTransactionNotifier, void>(
+  CreateTransactionNotifier.new,
+);
 
-  CreateTransactionProvider(this.repo);
+class CreateTransactionNotifier extends AsyncNotifier<void> {
+  @override
+  Future<void> build() async {}
 
-  dynamic error;
+  Future<void> createTransaction({
+    required int amountCents,
+    required String notes,
+  }) async {
+    state = const AsyncLoading();
 
-  Future<bool> createTransaction() async {
-    final amountCents = int.tryParse(amountController.text);
-    final notes = notesController.text;
-    final time = DateTime.now();
-    final paymentMethodId = 0;
-    final category = 'unknown';
-    final vendor = 'unknown';
-    final userId = -1;
-
-    if (amountCents == null) {
-      throw StateError("Amount is not a number");
-    }
-
+    final repo = ref.read(transactionRepositoryProvider);
     final t = TransactionModel.initial(
-      userId: userId,
+      userId: -1,
       amountCents: amountCents,
-      category: category,
-      vendor: vendor,
-      paymentMethodId: paymentMethodId,
+      category: 'unknown',
+      vendor: 'unknown',
+      paymentMethodId: 0,
       notes: notes,
-      time: time,
+      time: DateTime.now(),
     );
 
     final r = await repo.createTransaction(t);
-
     if (r.isError) {
-      error = r.error;
-      return false;
+      state = AsyncError(r.error!, StackTrace.current);
+      return;
     }
 
-    return true;
+    state = const AsyncData(null);
+    ref.invalidate(transactionsProvider);
   }
 }

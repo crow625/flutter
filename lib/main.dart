@@ -4,6 +4,7 @@ import 'package:flutter_app/src/app/app.dart';
 import 'package:flutter_app/src/app/app_config.dart';
 import 'package:flutter_app/src/screens/entry.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   // UI initialization
@@ -29,7 +30,9 @@ void main() async {
     print("INITIALIZATION SUCCESSFUL!");
   }
 
-  runApp(const MyApp());
+  runApp(const ProviderScope(
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
